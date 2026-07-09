@@ -1,5 +1,6 @@
 import json
 import os
+import tempfile
 import traceback
 
 import requests as http_requests
@@ -23,6 +24,42 @@ HEADERS = {
 }
 
 
+def get_ydl_opts():
+    """
+    ydl_opts میسازه و اگر کوکی توی env بود
+    یه فایل موقت میسازه و بهش میده
+    """
+    opts = {
+        "quiet":         True,
+        "no_warnings":   True,
+        "skip_download": True,
+        "http_headers":  HEADERS,
+    }
+
+    # ✅ کوکی از environment variable
+    cookies_content = os.environ.get("INSTAGRAM_COOKIES", "").strip()
+
+    if cookies_content:
+        # یه فایل موقت میسازیم چون yt-dlp فایل میخواد نه string
+        tmp = tempfile.NamedTemporaryFile(
+            mode="w",
+            suffix=".txt",
+            delete=False,
+            encoding="utf-8"
+        )
+        tmp.write(cookies_content)
+        tmp.close()
+        opts["cookiefile"] = tmp.name
+    else:
+        # اگر env نبود، دنبال فایل توی پروژه بگرد
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        local_cookies = os.path.join(BASE_DIR, "cookies.txt")
+        if os.path.exists(local_cookies):
+            opts["cookiefile"] = local_cookies
+
+    return opts
+
+
 @csrf_exempt
 def download_api(request):
     try:
@@ -37,20 +74,7 @@ def download_api(request):
         if not url:
             return JsonResponse({"ok": False, "error": "URL is empty"})
 
-        BASE_DIR     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        cookies_path = os.path.join(BASE_DIR, "cookies.txt")
-
-        ydl_opts = {
-            "quiet":        True,
-            "no_warnings":  True,
-            "skip_download": True,           # ✅ مطمئن بشو دانلود نکنه
-            "extract_flat":  False,
-            "http_headers":  HEADERS,
-            # ✅ هیچ outtmpl نذار — چیزی ذخیره نشه
-        }
-
-        if os.path.exists(cookies_path):
-            ydl_opts["cookiefile"] = cookies_path
+        ydl_opts = get_ydl_opts()
 
         if mode == "audio":
             return _handle_audio(url, ydl_opts)
@@ -89,7 +113,6 @@ def _handle_video(url, quality, ydl_opts):
         pool = merged
 
     best = max(pool, key=lambda f: (f.get("height") or 0, f.get("tbr") or 0))
-
     actual_height = best.get("height")
 
     return JsonResponse({
@@ -108,7 +131,6 @@ def _handle_audio(url, ydl_opts):
 
     formats = info.get("formats") or []
 
-    # اینستاگرام audio-only نداره — از merged استفاده می‌کنیم
     candidates = [
         f for f in formats
         if f.get("acodec") not in (None, "none")
@@ -131,7 +153,6 @@ def _handle_audio(url, ydl_opts):
 
 @csrf_exempt
 def proxy_download(request):
-    """فایل رو stream میکنه به مرورگر کاربر — هیچ چیزی روی سرور ذخیره نمیشه"""
     try:
         file_url = request.GET.get("url", "")
         filename = request.GET.get("filename", "instagram.mp4")
@@ -142,7 +163,6 @@ def proxy_download(request):
         r = http_requests.get(file_url, headers=HEADERS, stream=True, timeout=60)
         r.raise_for_status()
 
-        # ✅ Content-Type درست برای audio
         if filename.endswith(".mp3"):
             content_type = "audio/mpeg"
         elif filename.endswith(".mp4"):
@@ -154,13 +174,11 @@ def proxy_download(request):
             r.iter_content(chunk_size=8192),
             content_type=content_type,
         )
-        # ✅ این هدر باعث میشه مرورگر فایل رو دانلود کنه نه نمایش بده
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
-        
         content_length = r.headers.get("Content-Length")
         if content_length:
             response["Content-Length"] = content_length
-            
+
         return response
 
     except Exception as e:
