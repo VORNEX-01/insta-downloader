@@ -1,5 +1,5 @@
-asgiref==3.11.1
-Django==6.0.6
-sqlparse==0.5.5
-tzdata==2026.2
-yt-dlp==2026.6.9
+django
+yt-dlp
+requests
+gunicorn
+whitenoise
