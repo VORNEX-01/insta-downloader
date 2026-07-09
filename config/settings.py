@@ -3,13 +3,11 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ✅ از environment variable میخونه — توی Railway ست میکنیم
 SECRET_KEY = os.environ.get(
     "SECRET_KEY",
     "django-insecure-g&q-ur9=u(93l80k7_y(4hjqdb(w0lz7r4+0nvcd+q)ga7x(rj"
 )
 
-# ✅ توی Railway باید False باشه
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ["*"]
@@ -26,7 +24,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # ✅ whitenoise — برای serve کردن static files توی production
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -74,15 +71,11 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ✅ Static files
+# ✅ static از داخل core/static میخونه (APP_DIRS=True کافیه)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# ✅ whitenoise برای static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ✅ Railway
 CSRF_TRUSTED_ORIGINS = [
     "https://*.railway.app",
     "https://*.up.railway.app",
