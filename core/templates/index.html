@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}InstaGet — دانلودر اینستاگرام{% endblock %}
+
+{% block content %}
+
+<main class="hero">
+
+    <!-- Brand Badge -->
+    <div class="brand">
+        <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="20" height="20" rx="6" stroke="url(#ig-grad)" stroke-width="1.5" />
+                <circle cx="12" cy="12" r="4" stroke="url(#ig-grad)" stroke-width="1.5" />
+                <circle cx="17.5" cy="6.5" r="1.2" fill="url(#ig-grad)" />
+                <defs>
+                    <linearGradient id="ig-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#f09433" />
+                        <stop offset="25%" stop-color="#e6683c" />
+                        <stop offset="50%" stop-color="#dc2743" />
+                        <stop offset="75%" stop-color="#cc2366" />
+                        <stop offset="100%" stop-color="#bc1888" />
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <span class="brand-name">InstaGet</span>
+    </div>
+
+    <h1>دانلود ویدیو، ریلز<br>و عکس اینستاگرام</h1>
+    <p>فقط لینک پست یا ریلز را وارد کن؛ بقیه کارها با ما.</p>
+
+    <!-- Mode Tabs -->
+    <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="video">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" stroke-width="2" />
+                <polygon points="10,9 16,12 10,15" fill="currentColor" />
+            </svg>
+            ویدیو
+        </button>
+        <button class="mode-tab" data-mode="audio">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="2" />
+                <circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="2" />
+            </svg>
+            آهنگ (MP3)
+        </button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+        <div class="search-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+        <input id="url" type="url" autocomplete="off" spellcheck="false"
+            placeholder="لینک اینستاگرام را اینجا وارد کنید...">
+        <button id="downloadBtn" type="button">
+            <span class="btn-text">پیداش کن</span>
+            <span class="btn-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </span>
+        </button>
+    </div>
+
+    <!-- Quality (فقط توی حالت ویدیو نشون داده میشه) -->
+    <div class="quality-box" id="qualityBox">
+        <span class="quality-title">کیفیت</span>
+        <div class="quality-options">
+            <button type="button" class="quality-btn active" data-quality="best">Auto</button>
+            <button type="button" class="quality-btn" data-quality="480">480p</button>
+            <button type="button" class="quality-btn" data-quality="720">720p</button>
+            <button type="button" class="quality-btn" data-quality="1080">1080p</button>
+        </div>
+    </div>
+
+    <!-- Result -->
+    <div id="result"></div>
+
+    <!-- Toast -->
+    <div id="toast-container" aria-live="polite"></div>
+
+    <footer class="footer">
+        <p>ساخته شده توسط VORNEX  -->  <a href="https://www.instagram.com/vornex01" target="_blank"
+                rel="noopener noreferrer" style="color: #70c8ce;">اینستاگرام</a></p>
+    </footer>
+
+</main>
+
+{% endblock %}
